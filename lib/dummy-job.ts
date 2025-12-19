@@ -7,7 +7,7 @@ export const dummyJobs: Job[] = [
     title: "Senior Frontend Engineer",
     company: {
       name: "Gojek",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/9/91/Gojek_logo_2019.svg", // Pastikan URL valid/dummy image
+      logoUrl: "https://ui-avatars.com/api/?name=Gojek&background=random",
       websiteUrl: "https://gojek.com"
     },
     location: "Jakarta Selatan",
@@ -19,7 +19,6 @@ export const dummyJobs: Job[] = [
       currency: "IDR",
       isHidden: false
     },
-    // Description pakai HTML biar simulasi Rich Text Editor
     description: "<p>Kami mencari Frontend Engineer yang jago Next.js untuk tim GoFood.</p><p>Tanggung jawab: Optimasi performa web.</p>",
     requirements: [
       "Menguasai React.js & Next.js",
@@ -27,8 +26,8 @@ export const dummyJobs: Job[] = [
       "Minimal pengalaman 4 tahun"
     ],
     postedAt: "2023-12-18T09:00:00Z",
-    closingDate: "2024-01-18T09:00:00Z", // Wajib buat SEO
-    isFeatured: true, // Ini nanti dikasih badge "Hot Job" di UI
+    closingDate: "2024-01-18T09:00:00Z",
+    isFeatured: true,
     applyUrl: "https://career.gojek.com"
   },
   {
@@ -37,7 +36,7 @@ export const dummyJobs: Job[] = [
     title: "Laravel Backend Developer",
     company: {
       name: "StartUp Maju Jalan",
-      logoUrl: "https://ui-avatars.com/api/?name=StartUp+Maju&background=random", // Trik: Pake UI Avatars kalau ga ada logo
+      logoUrl: "https://ui-avatars.com/api/?name=StartUp+Maju&background=random",
     },
     location: "Remote (Indonesia)",
     workMode: "REMOTE",
@@ -46,7 +45,7 @@ export const dummyJobs: Job[] = [
       min: 8000000,
       max: 12000000,
       currency: "IDR",
-      isHidden: true // Nanti di UI tulisnya "Gaji Kompetitif"
+      isHidden: true
     },
     description: "<p>Dibutuhkan backend dev untuk bantu migrasi legacy code ke Laravel 10.</p>",
     requirements: [

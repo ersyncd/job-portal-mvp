@@ -35,11 +35,12 @@ export const JobCard = ({ job }: JobCardProps) => {
           <div className="flex shrink-0">
             {job.company.logoUrl ? (
               <Image
-                src={job.company.logoUrl}
+                src={`https://ui-avatars.com/api/?name=${encodeURI(job.company.name)}&background=random`}
                 alt={job.company.name}
                 width={200}
                 height={200}
                 className="w-12 h-12 rounded-lg object-contain border border-gray-100"
+                unoptimized
               />
             ) : (
               <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center text-white font-bold text-xl">

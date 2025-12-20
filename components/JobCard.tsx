@@ -18,7 +18,7 @@ interface JobCardProps {
 }
 
 export const JobCard = ({ job }: JobCardProps) => {
-  const companyInitial = job.company.name.charAt(0).toUpperCase();
+  const companyInitial = job.companyName.charAt(0).toUpperCase();
 
   return (
     <Link
@@ -29,10 +29,10 @@ export const JobCard = ({ job }: JobCardProps) => {
 
         <div className="flex items-start gap-3 mb-4">
           <div className="flex shrink-0">
-            {job.company.logoUrl ? (
+            {job.companyLogoUrl ? (
               <Image
-                src={`https://ui-avatars.com/api/?name=${encodeURI(job.company.name)}&background=random`}
-                alt={job.company.name}
+                src={`https://ui-avatars.com/api/?name=${encodeURI(job.companyName)}&background=random`}
+                alt={job.companyName}
                 width={200}
                 height={200}
                 className="w-11 h-11 rounded-md object-contain border border-gray-100"
@@ -49,7 +49,7 @@ export const JobCard = ({ job }: JobCardProps) => {
             <h3 className="font-semibold text-base text-gray-900 group-hover:text-gray-700 transition-colors truncate">
               {job.title}
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">{job.company.name}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{job.companyName}</p>
           </div>
         </div>
 
@@ -59,7 +59,7 @@ export const JobCard = ({ job }: JobCardProps) => {
           </span>
 
           <span className="bg-gray-50 text-gray-700 text-xs font-medium px-2 py-1 rounded-full border border-gray-200">
-            {job.workMode}
+            {job.location}
           </span>
         </div>
 
@@ -67,15 +67,14 @@ export const JobCard = ({ job }: JobCardProps) => {
           <div className="flex flex-col">
             <span className="text-xs text-gray-400 font-medium">Salary</span>
             <span className="text-sm font-semibold text-gray-900 mt-1">
-              {formatIDR(job.salary.min, job.salary.isHidden)}
-              {!job.salary.isHidden && ` - ${formatIDR(job.salary.max)}`}
+              {formatIDR(job.salaryMin, false)}
             </span>
           </div>
 
           <div className="text-right">
             <span className="text-xs text-gray-400 font-medium">Posted</span>
             <p className="text-xs text-gray-600 font-medium mt-1">
-              {formatDate(job.postedAt)}
+              {job.postedAt ? formatDate(job.postedAt) : 'N/A'}
             </p>
           </div>
         </div>

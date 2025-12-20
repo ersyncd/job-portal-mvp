@@ -1,34 +1,42 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { dummyJobs } from '@/lib/dummy-job';
 import { formatIDR } from '@/utils/currency';
 import { formatDate } from '@/utils/date';
 import { generateJobSchema } from '@/utils/seo';
-import { Job } from '@/types/job';
 import Image from 'next/image';
+
+import { db } from '@/db';
+import { jobs } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-function getJob(slug: string): Job | undefined {
-  return dummyJobs.find((j) => j.slug === slug);
+async function getJob(slug: string) {
+  const result = await db
+    .select()
+    .from(jobs)
+    .where(eq(jobs.slug, slug))
+    .limit(1);
+
+  return result[0];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const job = getJob(slug);
+  const job = await getJob(slug);
 
   if (!job) {
     return { title: 'Lowongan Tidak Ditemukan' };
   }
 
   return {
-    title: `${job.title} di ${job.company.name}`,
-    description: `Lamar lowongan ${job.title} di ${job.company.name} sekarang. Gaji: ${formatIDR(job.salary.min, job.salary.isHidden)}.`,
+    title: `${job.title} di ${job.companyName}`,
+    description: `Lamar lowongan ${job.title} di ${job.companyName} sekarang. Gaji: ${formatIDR(job.salaryMin)}.`,
     openGraph: {
-      images: [job.company.logoUrl || '']
+      images: [job.companyLogoUrl || '']
     }
   };
 }
@@ -36,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function JobDetailPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const job = getJob(slug);
+  const job = await getJob(slug);
 
   if (!job) {
     notFound();
@@ -65,17 +73,18 @@ export default async function JobDetailPage({ params }: PageProps) {
               <div className="flex-1">
                 <h1 className="text-4xl font-semibold text-gray-900 mb-3">{job.title}</h1>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                  <span className="font-medium">{job.company.name}</span>
+                  {/* 👇 Ubah job.company.name jadi job.companyName */}
+                  <span className="font-medium">{job.companyName}</span>
                   <span className="text-gray-300">·</span>
                   <span>{job.location}</span>
                 </div>
               </div>
 
               <div className="w-14 h-14 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                {job.company.logoUrl ? (
+                {job.companyLogoUrl ? (
                   <Image
-                    src={`https://ui-avatars.com/api/?name=${encodeURI(job.company.name)}&background=random`}
-                    alt={job.company.name}
+                    src={`https://ui-avatars.com/api/?name=${encodeURI(job.companyName)}&background=random`}
+                    alt={job.companyName}
                     width={200}
                     height={200}
                     className="w-full h-full object-contain"
@@ -83,7 +92,7 @@ export default async function JobDetailPage({ params }: PageProps) {
                   />
                 ) : (
                   <span className="text-lg font-semibold text-gray-600">
-                    {job.company.name.charAt(0)}
+                    {job.companyName.charAt(0)}
                   </span>
                 )}
               </div>
@@ -91,11 +100,12 @@ export default async function JobDetailPage({ params }: PageProps) {
 
             <div className="flex flex-wrap items-center gap-3">
               <span className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200">
+                {/* Pastikan jobType di database tidak null, atau handle default value */}
                 {job.jobType.replace('_', ' ')}
               </span>
               <span className="text-gray-900 font-semibold text-base">
-                {formatIDR(job.salary.min, job.salary.isHidden)}
-                {!job.salary.isHidden && ' - ' + formatIDR(job.salary.max)}
+                {/* 👇 Ubah job.salary.min jadi job.salaryMin */}
+                {formatIDR(job.salaryMin)} - {formatIDR(job.salaryMax)}
               </span>
               <span className="text-gray-400 text-sm">/ bulan</span>
             </div>
@@ -113,7 +123,8 @@ export default async function JobDetailPage({ params }: PageProps) {
 
               <h2 className="text-base font-semibold text-gray-900 mt-8 mb-4 uppercase tracking-wide">Persyaratan</h2>
               <ul className="space-y-3 text-gray-600 text-sm">
-                {job.requirements.map((req, index) => (
+                {/* 👇 Pastikan requirements tidak null sebelum di-map */}
+                {job.requirements?.map((req, index) => (
                   <li key={index} className="flex gap-3">
                     <span className="text-gray-400 shrink-0 mt-0.5">•</span>
                     <span>{req}</span>
@@ -125,11 +136,14 @@ export default async function JobDetailPage({ params }: PageProps) {
             <div className="p-8 bg-gray-50 flex flex-col gap-6 border-l border-gray-100">
               <div className="p-4 bg-white rounded-lg border border-gray-200">
                 <p className="text-xs text-gray-500 font-medium mb-2">BATAS LAMARAN</p>
+                {/* 👇 Tanggal dari DB sudah object Date, aman untuk utility */}
                 <p className="font-semibold text-gray-900 text-base">{formatDate(job.closingDate)}</p>
               </div>
 
+              {/* ⚠️ Catatan: Kolom applyUrl atau link belum ada di schema database kita tadi. 
+                  Untuk sementara saya arahkan ke mailto atau placeholder '#' */}
               <a
-                href={job.applyUrl}
+                href={`mailto:hr@${job.companyName.replace(/\s+/g, '').toLowerCase()}.com`}
                 target="_blank"
                 className="w-full block text-center bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300"
               >

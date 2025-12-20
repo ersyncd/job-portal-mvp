@@ -1,6 +1,8 @@
-import { dummyJobs } from '@/lib/dummy-job';
 import { JobCard } from '@/components/JobCard';
 import JobSearch from '@/components/JobSearch';
+import { db } from '@/db';
+import { jobs } from '@/db/schema';
+import { desc } from 'drizzle-orm';
 
 interface HomeProps {
   searchParams: Promise<{ q?: string }>
@@ -10,10 +12,12 @@ export default async function Home({ searchParams }: HomeProps) {
   const { q } = await searchParams;
   const query = q?.toLowerCase() || "";
 
-  const filteredJobs = dummyJobs.filter((job) => {
+  const jobList = await db.select().from(jobs).orderBy(desc(jobs.postedAt))
+
+  const filteredJobs = jobList.filter((job) => {
     return (
       job.title.toLowerCase().includes(query) ||
-      job.company.name.toLowerCase().includes(query)
+      job.companyName.toLowerCase().includes(query)
     );
   });
 

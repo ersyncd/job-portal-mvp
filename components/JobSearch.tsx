@@ -16,7 +16,6 @@ export default function JobSearch() {
   useEffect(() => {
     const currentQuery = searchParams.get('q')?.toString() || '';
 
-    // guard to prevent Infinite loop 
     if (debouncedTerm == currentQuery) return;
 
     const params = new URLSearchParams(searchParams);

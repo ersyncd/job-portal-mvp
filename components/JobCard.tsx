@@ -47,9 +47,9 @@ export const JobCard = ({ job }: JobCardProps) => {
 
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-base text-gray-900 group-hover:text-gray-700 transition-colors truncate">
-              {job.title}
+              {job.title} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium quaerat corporis minus, natus obcaecati provident quisquam dignissimos accusamus nostrum exercitationem.
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">{job.companyName}</p>
+            <p className="text-xs text-gray-500 mt-0.5 truncate">{job.companyName}</p>
           </div>
         </div>
 

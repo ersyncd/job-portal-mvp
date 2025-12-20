@@ -1,25 +1,23 @@
 import { JobCard } from '@/components/JobCard';
+import JobPagination from '@/components/JobPagination';
 import JobSearch from '@/components/JobSearch';
-import { db } from '@/db';
-import { jobs } from '@/db/schema';
-import { desc } from 'drizzle-orm';
+import { getJobs } from '@/services/getJobs';
+
+interface ParamsProps {
+  q?: string;
+  page?: string;
+}
 
 interface HomeProps {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<ParamsProps>
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  const { q } = await searchParams;
+  const { q, page } = await searchParams;
   const query = q?.toLowerCase() || "";
+  const pageNum = Number(page) || 1;
 
-  const jobList = await db.select().from(jobs).orderBy(desc(jobs.postedAt))
-
-  const filteredJobs = jobList.filter((job) => {
-    return (
-      job.title.toLowerCase().includes(query) ||
-      job.companyName.toLowerCase().includes(query)
-    );
-  });
+  const { data, totalPages } = await getJobs({ query: query, page: pageNum });
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -36,20 +34,23 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pb-20">
+      <div className="container mx-auto px-4 pb-20 min-h-181">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-          {filteredJobs.map((job) => (
+          {data.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}
         </div>
 
-        {filteredJobs.length === 0 && (
+        {data.length === 0 && (
           <div className="text-center py-24 text-gray-400">
             <p className="text-sm font-medium">Belum ada lowongan tersedia saat ini.</p>
           </div>
         )}
       </div>
+
+      <JobPagination currentPage={pageNum} totalPages={totalPages} />
+
     </main>
   );
 }
